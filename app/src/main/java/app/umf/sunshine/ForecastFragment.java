@@ -1,5 +1,6 @@
 package app.umf.sunshine;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -59,7 +61,7 @@ public class ForecastFragment extends Fragment {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             FetchWeatherTask weatherTask=new FetchWeatherTask();
-            weatherTask.execute("47.82","35.18");
+            weatherTask.execute("47.82","35.18"); //coord of Zaporizhzhya
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -84,8 +86,18 @@ public class ForecastFragment extends Fragment {
                 R.id.list_item_forecast_textview,
                 weekForecast);
         View rootview=inflater.inflate(R.layout.fragment_main,container,false);
-        ListView listView=(ListView) rootview.findViewById(R.id.listView_forecast);
+        final ListView listView=(ListView) rootview.findViewById(R.id.listView_forecast);
         listView.setAdapter(mForecastAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String forecast=mForecastAdapter.getItem(i);
+                Intent intent=new Intent(getActivity(),DetailActivity.class).putExtra(Intent.EXTRA_TEXT,forecast);
+                startActivity(intent);
+                //Toast.makeText(getActivity(),forecast,Toast.LENGTH_SHORT).show();
+
+            }
+        });
         return rootview;
     }
 
@@ -111,7 +123,11 @@ public class ForecastFragment extends Fragment {
             // For presentation, assume the user doesn't care about tenths of a degree.
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
-
+            //convert from F to C  (temperature)
+            if(roundedHigh>250)
+            {roundedHigh-=273;}
+            if(roundedLow>250)
+            {roundedLow-=273;}
             String highLowStr = roundedHigh + "/" + roundedLow;
             return highLowStr;
         }
@@ -134,9 +150,12 @@ public class ForecastFragment extends Fragment {
             final String OWM_DESCRIPTION = "main";
 
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
+
+            //checking city
             JSONObject my=forecastJson.getJSONObject("city");
             String mycityname=my.getString("name");
-        Log.i("LOL", " CITY ==="+mycityname);
+            Log.i("LOL", " CITY ==="+mycityname);
+
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
             // OWM returns daily forecasts based upon the local time of the city that is being
@@ -217,16 +236,17 @@ public class ForecastFragment extends Fragment {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
-                    final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
-                final String QUERY_PARAM = "q";
-                final String QUERY_PARAM2 = "id";
-                final String QUERY_PARAM3 = "id";
+                final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
+
+               // final String QUERY_PARAM = "q";
+               // final String QUERY_PARAM2 = "id";
+               // final String QUERY_PARAM3 = "id";
                 final String QUERY_PARAM4 = "lat";
                 final String QUERY_PARAM5 = "lon";
 
-               //687700   687676 687699
-                final String FORMAT_PARAM = "mode";
-                final String UNITS_PARAM = "units";
+
+              //  final String FORMAT_PARAM = "mode";
+              //  final String UNITS_PARAM = "units";
                 final String DAYS_PARAM = "cnt";
                 final String APPID_PARAM = "APPID";
 
