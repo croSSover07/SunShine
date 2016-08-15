@@ -62,6 +62,8 @@ public class ForecastFragment extends Fragment {
         if (id == R.id.action_refresh) {
             FetchWeatherTask weatherTask=new FetchWeatherTask();
             weatherTask.execute("47.82","35.18"); //coord of Zaporizhzhya
+            //weatherTask.execute("687770"); //id = 687700 zp
+
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -124,10 +126,10 @@ public class ForecastFragment extends Fragment {
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
             //convert from F to C  (temperature)
-            if(roundedHigh>250)
-            {roundedHigh-=273;}
-            if(roundedLow>250)
-            {roundedLow-=273;}
+//            if(roundedHigh>200)
+//            {roundedHigh-=273;}
+//            if(roundedLow>200)
+//            {roundedLow-=273;}
             String highLowStr = roundedHigh + "/" + roundedLow;
             return highLowStr;
         }
@@ -154,7 +156,7 @@ public class ForecastFragment extends Fragment {
             //checking city
             JSONObject my=forecastJson.getJSONObject("city");
             String mycityname=my.getString("name");
-            Log.i("LOL", " CITY ==="+mycityname);
+            Log.i("LOL", " CITY ==="+mycityname +"  id="+my.getString("id"));
 
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
@@ -246,7 +248,7 @@ public class ForecastFragment extends Fragment {
 
 
               //  final String FORMAT_PARAM = "mode";
-              //  final String UNITS_PARAM = "units";
+                 final String UNITS_PARAM = "units";
                 final String DAYS_PARAM = "cnt";
                 final String APPID_PARAM = "APPID";
 
@@ -254,7 +256,7 @@ public class ForecastFragment extends Fragment {
                         .appendQueryParameter(QUERY_PARAM4, params[0])
                         .appendQueryParameter(QUERY_PARAM5, params[1])
                         //.appendQueryParameter(FORMAT_PARAM, format)
-                        //.appendQueryParameter(UNITS_PARAM, units)
+                         .appendQueryParameter(UNITS_PARAM, units)
                         .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
                         .appendQueryParameter(APPID_PARAM, BuildConfig.OPEN_WEATHER_MAP_API_KEY)
                         .build();
